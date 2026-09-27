@@ -1,0 +1,6 @@
+{
+  "name": "Survei Minat, Bakat & Rekomendasi Lomba",
+  "description": "Aplikasi survei interaktif minat dan bakat siswa sekolah untuk mendapatkan rekomendasi lomba eksternal yang relevan serta dashboard admin.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

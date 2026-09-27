@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidQuestion(data) {
+      return data.keys().hasAll(['text', 'options']) &&
+             data.text is string && data.text.size() > 0 && data.text.size() <= 1000 &&
+             data.options is list && data.options.size() <= 10;
+    }
+
+    function isValidResponse(data) {
+      return data.keys().hasAll(['studentName', 'studentClass', 'dominantCategory', 'categoryScores', 'timestamp']) &&
+             data.studentName is string && data.studentName.size() > 0 && data.studentName.size() <= 200 &&
+             data.studentClass is string && data.studentClass.size() > 0 && data.studentClass.size() <= 100 &&
+             data.dominantCategory is string && data.dominantCategory.size() <= 50 &&
+             data.categoryScores is map &&
+             data.timestamp is number;
+    }
+
+    function isValidClass(data) {
+      return data.keys().hasAll(['name']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100;
+    }
+
+    // Classes: Anyone can read class list; admin can create, update, delete
+    match /classes/{classId} {
+      allow read: if true;
+      allow create: if isValidId(classId) && isValidClass(request.resource.data);
+      allow update: if isValidId(classId) && isValidClass(request.resource.data);
+      allow delete: if isValidId(classId);
+    }
+
+    // Questions: Any student/user can read survey questions, write/manage allowed
+    match /questions/{questionId} {
+      allow read: if true;
+      allow create: if isValidId(questionId) && isValidQuestion(request.resource.data);
+      allow update: if isValidId(questionId) && isValidQuestion(request.resource.data);
+      allow delete: if isValidId(questionId);
+    }
+
+    // Responses: Survey submissions by students and admin statistics recap
+    match /responses/{responseId} {
+      allow read: if true;
+      allow create: if isValidId(responseId) && isValidResponse(request.resource.data);
+      allow update: if isValidId(responseId) && isValidResponse(request.resource.data);
+      allow delete: if isValidId(responseId);
+    }
+  }
+}

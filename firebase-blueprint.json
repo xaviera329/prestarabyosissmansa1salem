@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "Question": {
+      "title": "Question",
+      "description": "Survei minat dan bakat question entity with 6 categorical options.",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Question situation or scenario text.",
+          "maxLength": 500
+        },
+        "options": {
+          "type": "array",
+          "description": "Array of 6 categorical options (sains, teknologi, seni, olahraga, bahasa, bisnis)."
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Timestamp when the question was created."
+        }
+      },
+      "required": ["text", "options"]
+    },
+    "SurveyResponse": {
+      "title": "SurveyResponse",
+      "description": "Student survey result including category scores, dominant talent, and profile details.",
+      "type": "object",
+      "properties": {
+        "studentName": {
+          "type": "string",
+          "description": "Full name of the student.",
+          "maxLength": 150
+        },
+        "studentClass": {
+          "type": "string",
+          "description": "Class or grade level of the student.",
+          "maxLength": 50
+        },
+        "studentEmail": {
+          "type": "string",
+          "description": "Optional email of the student.",
+          "maxLength": 100
+        },
+        "dominantCategory": {
+          "type": "string",
+          "description": "Primary talent category key (sains, teknologi, seni, olahraga, bahasa, bisnis).",
+          "enum": ["sains", "teknologi", "seni", "olahraga", "bahasa", "bisnis"]
+        },
+        "categoryScores": {
+          "type": "object",
+          "description": "Score distribution map per talent category."
+        },
+        "answers": {
+          "type": "object",
+          "description": "Map of questionId to chosen category."
+        },
+        "submittedAt": {
+          "type": "string",
+          "description": "Formatted timestamp string."
+        },
+        "timestamp": {
+          "type": "number",
+          "description": "Unix millisecond timestamp of submission."
+        }
+      },
+      "required": ["studentName", "studentClass", "dominantCategory", "categoryScores", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/questions/{questionId}": {
+      "schema": "Question",
+      "description": "Collection of survey questions managed by school administrators."
+    },
+    "/responses/{responseId}": {
+      "schema": "SurveyResponse",
+      "description": "Collection of student survey responses and talent recommendations."
+    }
+  }
+}
